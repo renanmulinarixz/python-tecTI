@@ -1,0 +1,21 @@
+# ESSE É UM EXEMPLO DO QUE NÃO FAZER!
+!!!!!!!Hardcoded
+
+
+Um petshop precisa de um sistema simples para calcular o valor do banho de cachorros.
+O preço do banho varia de acordo com o peso e a raça do animal.
+
+Criar um programa em Python que:
+
+Utilize um dicionário com informações de cães
+ Permita ao usuário escolher um cachorro
+ Mostre o peso, a raça e o valor do banho
+
+
+
+ Cada quilo do cachorro é cobrado o valor de 2.5
+
+
+ Crie um arquivo para ler o json
+ Crie um arquivo de menu
+ Crie a main

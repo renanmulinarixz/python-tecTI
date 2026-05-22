@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    div {
+        color: red;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        font-style: bold;
+        background-color:rgba(128, 128, 128, 0.555) ;
+        list-style: none;
+    }
+    section{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .grande{
+        font-size: large;
+        
+    }
+</style>
+<body>
+    <section>
+        <div class="grande">DECORATOR</div>
+        <div>
+            <h1>1 - É uma função que "envolve" outra função para modificar ou estender o seu comportamento sem alterar o código original dela.</h1>
+            <h2>
+                <li>2 -
+                    <ul>Reutilização de código: Permite aplicar a mesma lógica (como logs, autenticação ou medição de tempo) em várias funções diferentes.</ul>
+                    <ul>Separação de conceitos: Mantém a lógica principal da função limpa, deixando tarefas secundárias para o decorator.</ul>
+                    <ul>Controle de acesso: Muito usado para verificar se um usuário está logado antes de permitir a execução de uma ação.</ul>
+                </li>
+            </h2>
+            <h3>3 - Registro de Rota: Ele avisa ao servidor Flask que aquela função específica deve ser executada sempre que alguém acessar uma URL determinada (ex: o endereço principal /).</h3>
+        </div>
+    </section>
+</body>
+</html>

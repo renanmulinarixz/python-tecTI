@@ -1,0 +1,20 @@
+{
+    "nome": "janaina",
+    "saldo": -799.0,
+    "transacoes": [
+        {
+            "valor": 201.0,
+            "categoria": "mesada",
+            "descricao": "b\u00f4nus",
+            "tipo": "entrada",
+            "data": "2026-04-12 20:46:02"
+        },
+        {
+            "valor": 2000.0,
+            "categoria": "lanchonete",
+            "descricao": "coxinha",
+            "tipo": "gasto",
+            "data": "2026-04-12 20:46:18"
+        }
+    ]
+}
