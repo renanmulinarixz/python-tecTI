@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <h1>Calculadora</h1>
+
+    <div id="calculator">
+        <form method="POST" action="{{ url_for('index') }}">
+
+            {% set op = request.form.get('operacao', '+') %}
+
+            <!-- Número 1 -->
+            <div class="form-grupo">
+                {% if op == 'bhaskara' %}
+                    <label for="num1">Coeficiente A</label>
+                {% else %}
+                    <label for="num1">Primeiro número</label>
+                {% endif %}
+                <input type="number" id="num1" name="num1" step="any" required
+                       value="{{ request.form.get('num1', '') }}">
+            </div>
+
+            <!-- Operação -->
+            <div class="form-grupo">
+                <label for="operacao">Operação</label>
+                <select id="operacao" name="operacao" required>
+                    <option value="+"        {% if op == '+' %}selected{% endif %}>+ Adição</option>
+                    <option value="-"        {% if op == '-' %}selected{% endif %}>− Subtração</option>
+                    <option value="*"        {% if op == '*' %}selected{% endif %}>× Multiplicação</option>
+                    <option value="/"        {% if op == '/' %}selected{% endif %}>÷ Divisão</option>
+                    <option value="**"       {% if op == '**' %}selected{% endif %}>^ Potência</option>
+                    <option value="sqrt"     {% if op == 'sqrt' %}selected{% endif %}>√ Raiz Quadrada</option>
+                    <option value="log"      {% if op == 'log' %}selected{% endif %}>log Logaritmo base 10</option>
+                    <option value="ln"       {% if op == 'ln' %}selected{% endif %}>ln Logaritmo natural</option>
+                    <option value="bhaskara" {% if op == 'bhaskara' %}selected{% endif %}>📐 Bhaskara (ax²+bx+c)</option>
+                </select>
+            </div>
+
+            <!-- Número 2 — oculto para sqrt, log e ln -->
+            {% if op not in ['sqrt', 'log', 'ln'] %}
+            <div class="form-grupo">
+                {% if op == 'bhaskara' %}
+                    <label for="num2">Coeficiente B</label>
+                {% else %}
+                    <label for="num2">Segundo número</label>
+                {% endif %}
+                <input type="number" id="num2" name="num2" step="any" required
+                       value="{{ request.form.get('num2', '') }}">
+            </div>
+            {% endif %}
+
+            <!-- Coeficiente C — só para Bhaskara -->
+            {% if op == 'bhaskara' %}
+            <div class="form-grupo">
+                <label for="num3">Coeficiente C</label>
+                <input type="number" id="num3" name="num3" step="any" required
+                       value="{{ request.form.get('num3', '') }}">
+            </div>
+            <div class="legenda-bhaskara">
+                A = num1 &nbsp;|&nbsp; B = num2 &nbsp;|&nbsp; C = coeficiente C
+                <br>Equação: Ax² + Bx + C = 0
+            </div>
+            {% endif %}
+
+            <button type="submit">Calcular</button>
+        </form>
+
+        <!-- Resultado -->
+        {% if etapas %}
+        <div class="resultado">
+            <strong>Resposta do servidor (Python):</strong>
+            <div class="etapas">{{ etapas }}</div>
+            <div class="resultado-valor">Resultado: {{ resultados }}</div>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('index') }}">Limpar / nova conta</a>
+    </div>
+
+</body>
+</html>
