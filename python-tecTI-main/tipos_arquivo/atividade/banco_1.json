@@ -1,0 +1,7 @@
+[
+  {"nome": "Tony Stark", "riqueza_bilhoes": 100, "cidade": "Malibu"},
+  {"nome": "Bruce Wayne", "riqueza_bilhoes": 85, "cidade": "Gotham City"},
+  {"nome": "T'Challa", "riqueza_bilhoes": 90, "cidade": "Wakanda"},
+  {"nome": "Lex Luthor", "riqueza_bilhoes": 75, "cidade": "Metropolis"},
+  {"nome": "Scrooge McDuck", "riqueza_bilhoes": 120, "cidade": "Duckburg"}
+]

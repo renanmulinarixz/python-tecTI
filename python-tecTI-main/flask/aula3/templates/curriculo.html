@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Renan Mulinari Silva — Currículo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --black: #0a0a0a;
+  --white: #f5f5f0;
+  --gray-100: #e8e8e3;
+  --gray-300: #b0b0a8;
+  --gray-500: #6e6e66;
+  --gray-700: #3a3a35;
+  --accent: #1a1a1a;
+}
+
+body {
+  background-color: var(--white);
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  min-height: 100vh;
+  padding: 48px 24px;
+}
+
+.page {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  border-top: 3px solid var(--black);
+  border-bottom: 1px solid var(--gray-300);
+  padding: 28px 0 20px;
+  margin-bottom: 48px;
+  gap: 24px;
+}
+
+.header-name h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  color: var(--black);
+}
+
+.header-name .subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-top: 8px;
+}
+
+.header-meta {
+  text-align: right;
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--gray-500);
+  line-height: 1.9;
+  letter-spacing: 0.03em;
+}
+
+.header-meta a {
+  color: var(--gray-500);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gray-300);
+  transition: color 0.2s, border-color 0.2s;
+}
+.header-meta a:hover {
+  color: var(--black);
+  border-color: var(--black);
+}
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0 48px;
+}
+
+.main-col { grid-column: 1; }
+.side-col  { grid-column: 2; }
+
+/* ── SECTION ─────────────────────────────────────────── */
+section {
+  margin-bottom: 40px;
+}
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  border-bottom: 1px solid var(--gray-100);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+/* ── OBJETIVO ─────────────────────────────────────────── */
+.objetivo p {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--gray-700);
+  font-style: italic;
+}
+
+/* ── ENTRY (experiência / formação) ─────────────────── */
+.entry {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.entry-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: -0.2px;
+}
+
+.entry-date {
+  font-size: 10px;
+  color: var(--gray-300);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+
+.entry-org {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+  letter-spacing: 0.03em;
+}
+
+.entry-desc {
+  font-size: 12px;
+  color: var(--gray-700);
+  line-height: 1.7;
+}
+
+/* ── SKILLS (sidebar) ─────────────────────────────────── */
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--gray-300);
+  color: var(--gray-700);
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+.skill-tag:hover {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+/* ── CURSOS LIST ─────────────────────────────────────── */
+.curso-item {
+  font-size: 11px;
+  color: var(--gray-700);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--gray-100);
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+}
+.curso-item::before {
+  content: '—';
+  color: var(--gray-300);
+  flex-shrink: 0;
+}
+.curso-item:last-child {
+  border-bottom: none;
+}
+
+/* ── CONTATO SIDEBAR ─────────────────────────────────── */
+.contact-list {
+  list-style: none;
+  font-size: 11px;
+  font-weight: 300;
+  line-height: 2;
+}
+.contact-list li {
+  color: var(--gray-700);
+  display: flex;
+  gap: 8px;
+}
+.contact-list .contact-label {
+  color: var(--gray-300);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  width: 40px;
+  padding-top: 3px;
+  flex-shrink: 0;
+}
+.contact-list a {
+  color: var(--gray-700);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.contact-list a:hover {
+  color: var(--black);
+  border-color: var(--black);
+}
+
+/* ── FOOTER ─────────────────────────────────────────── */
+footer {
+  margin-top: 48px;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gray-300);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  header {
+    grid-template-columns: 1fr;
+  }
+  .header-meta {
+    text-align: left;
+  }
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .side-col {
+    grid-column: 1;
+  }
+}
+</style>
+<body>
+  <div class="page">
+
+    <!-- ── HEADER ── -->
+    <header>
+      <div class="header-name">
+        <h1>Renan Mulinari Silva</h1>
+        <p class="subtitle">Desenvolvedor em Formação · Estágio em TI</p>
+      </div>
+      <div class="header-meta">
+        <div>17 anos · Brasileiro</div>
+        <div>Belo Horizonte, MG — zona oeste</div>
+        <div>(31) 99081-1812</div>
+        <div><a href="mailto:mulinarisilvart@gmail.com">mulinarisilvart@gmail.com</a></div>
+        <div><a href="https://linkedin.com/in/renan-mulinari-silva/" target="_blank">linkedin/renan-mulinari-silva</a></div>
+        <div><a href="https://github.com/renanmulinarixz" target="_blank">github/renanmulinarixz</a></div>
+      </div>
+    </header>
+
+    <!-- ── LAYOUT PRINCIPAL ── -->
+    <div class="layout">
+
+      <!-- ── COLUNA PRINCIPAL ── -->
+      <div class="main-col">
+
+        <!-- Objetivo -->
+        <section>
+          <p class="section-label">Objetivo</p>
+          <div class="objetivo">
+            <p>Busco uma oportunidade de estágio na área de Tecnologia da Informação, onde possa aplicar e desenvolver meus conhecimentos em programação e desenvolvimento web e mobile, contribuindo com soluções eficientes enquanto evoluo profissionalmente.</p>
+          </div>
+        </section>
+
+        <!-- Formação Acadêmica -->
+        <section>
+          <p class="section-label">Formação Acadêmica</p>
+
+          <div class="entry">
+            <div class="entry-header">
+              <span class="entry-title">Ensino Médio Técnico</span>
+              <span class="entry-date">Em andamento</span>
+            </div>
+            <p class="entry-org">Colégio Cotemig — Unidade Barroca</p>
+            <p class="entry-desc">Formação com foco em tecnologia, programação e desenvolvimento de sistemas. Curso dev Web Mobile em andamento, com previsão de término em dezembro de 2026.</p>
+          </div>
+
+          <div class="entry">
+            <div class="entry-header">
+              <span class="entry-title">Ensino Fundamental</span>
+              <span class="entry-date">Concluído</span>
+            </div>
+            <p class="entry-org">Escola SetiUnimaster</p>
+          </div>
+        </section>
+
+        <!-- Cursos Complementares -->
+        <section>
+          <p class="section-label">Cursos Complementares e Certificados</p>
+
+          <div class="curso-item">Curso Lógica Programação — OneByte (certificado)</div>
+          <div class="curso-item">Curso básico de hardware e computadores — Cisco (certificado)</div>
+          <div class="curso-item">Minas Summit — edição 2025 (certificado)</div>
+          <div class="curso-item">Hackaton Seb 2023 e 2024 (certificado)</div>
+          <div class="curso-item">Representante de sala 2023 e 2024 (certificado)</div>
+          <div class="curso-item">6 anos totais de estudo de inglês autônomo + curso</div>
+          <div class="curso-item">Imersão sobre automações com n8n pela Hashtag</div>
+          <div class="curso-item">Curso de planilhas Google (Udemy)</div>
+          <div class="curso-item">Curso monitor CodeClub</div>
+        </section>
+
+      </div><!-- /main-col -->
+
+      <!-- ── COLUNA LATERAL ── -->
+      <div class="side-col">
+
+        <!-- Stack técnica -->
+        <section>
+          <p class="section-label">Stack Técnica</p>
+          <div class="skills-grid">
+            <span class="skill-tag">HTML</span>
+            <span class="skill-tag">CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">C#</span>
+            <span class="skill-tag">C++</span>
+            <span class="skill-tag">Dart</span>
+            <span class="skill-tag">Kotlin</span>
+            <span class="skill-tag">Swift</span>
+            <span class="skill-tag">MySQL</span>
+            <span class="skill-tag">iOS</span>
+            <span class="skill-tag">Android</span>
+          </div>
+        </section>
+
+        <!-- Resumo -->
+        <section>
+          <p class="section-label">Sobre</p>
+          <p class="entry-desc">Estudante de Tecnologia com foco em desenvolvimento Frontend e Backend. Cursando o Ensino Médio Técnico em Desenvolvimento Web e Mobile no Colégio Cotemig.</p>
+          <br>
+          <p class="entry-desc">Boa organização, comunicação e facilidade de aprendizado. Grande interesse em evoluir na área de desenvolvimento de software e adquirir experiência prática.</p>
+        </section>
+
+        <!-- Contato -->
+        <section>
+          <p class="section-label">Contato</p>
+          <ul class="contact-list">
+            <li>
+              <span class="contact-label">Tel</span>
+              (31) 99081-1812
+            </li>
+            <li>
+              <span class="contact-label">Email</span>
+              <a href="mailto:mulinarisilvart@gmail.com">mulinarisilvart<br>@gmail.com</a>
+            </li>
+            <li>
+              <span class="contact-label">LI</span>
+              <a href="https://linkedin.com/in/renan-mulinari-silva/" target="_blank">renan-mulinari-silva</a>
+            </li>
+            <li>
+              <span class="contact-label">GH</span>
+              <a href="https://github.com/renanmulinarixz" target="_blank">renanmulinarixz</a>
+            </li>
+          </ul>
+        </section>
+
+      </div><!-- /side-col -->
+
+    </div><!-- /layout -->
+
+    <!-- ── FOOTER ── -->
+    <footer>
+      <span>Renan Mulinari Silva</span>
+      <span>Belo Horizonte · 2025</span>
+    </footer>
+
+  </div><!-- /page -->
+</body>
+</html>
