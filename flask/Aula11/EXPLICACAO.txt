@@ -1,0 +1,334 @@
+================================================================================
+EXPLICAÇÃO DO CÓDIGO — CENÁRIO C: TROCA DE FIGURINHAS COPA
+Aula 11 — Padrão MVC com Flask + SQLAlchemy
+================================================================================
+
+Este documento explica CADA PARTE do projeto, na ordem em que o Flask
+as carrega ao iniciar.
+
+================================================================================
+ESTRUTURA DE ARQUIVOS
+================================================================================
+
+Aula11/
+├── app.py                                  ← ponto de entrada do servidor
+├── EXPLICACAO.txt                          ← este arquivo
+│
+├── models/                                 ← camada MODEL (banco de dados)
+│   ├── __init__.py                         ← cria db, importa todos os models
+│   ├── base.py                             ← classe base com id + data_criacao
+│   ├── colecionador.py                     ← tabela colecionadores
+│   ├── figurinha.py                        ← tabela figurinhas
+│   └── oferta.py                           ← tabelas ofertas_troca + itens_oferta
+│
+├── controllers/                            ← camada CONTROLLER (rotas Flask)
+│   ├── __init__.py                         ← exporta o Blueprint
+│   └── figurinhas_controller.py            ← rotas /figurinhas/*
+│
+└── views/
+    └── templates/
+        ├── layout.html                     ← HTML base (menu, estrutura)
+        └── figurinhas/
+            ├── lista_ofertas.html          ← tela do mural de ofertas
+            └── formulario_oferta.html      ← tela de nova oferta
+
+
+================================================================================
+1. models/__init__.py — PONTO DE ENTRADA DO PACOTE models
+================================================================================
+
+O que faz:
+  - Cria db = SQLAlchemy(), a instância ÚNICA compartilhada por todo o projeto.
+  - Importa todos os models NA ORDEM CORRETA (base → tabelas filhas).
+  - Expõe __all__ para deixar claro o que o pacote exporta.
+
+Por que importar os models aqui?
+  Quando o app.py chama db.create_all(), o SQLAlchemy precisa "conhecer" todas
+  as classes de model para criar as tabelas. Se um model não for importado
+  neste arquivo, sua tabela NÃO é criada — causando erros de FK ou de tabela
+  inexistente.
+
+Relação com app.py:
+  app.py importa `db` daqui e chama db.init_app(app), "plugando" o SQLAlchemy
+  ao Flask sem criar dependência circular.
+
+
+================================================================================
+2. models/base.py — CLASSE BASE (ModeloBase)
+================================================================================
+
+O que faz:
+  Define a classe ModeloBase com __abstract__ = True — isso significa que
+  o SQLAlchemy NÃO cria uma tabela para ela; ela é apenas um molde.
+
+Campos herdados por TODOS os models:
+  - id            → Integer, chave primária, autoincrement
+  - data_criacao  → DateTime, preenchida automaticamente no INSERT
+
+Por que usar classe base?
+  Evita repetir id e data_criacao em cada model. Princípio DRY.
+  Todos os models do projeto herdam: class MinhaTabela(ModeloBase)
+
+
+================================================================================
+3. models/colecionador.py — TABELA colecionadores
+================================================================================
+
+O que faz:
+  Representa um participante do mural de trocas.
+
+Campos:
+  - id, data_criacao   → herdados de ModeloBase
+  - apelido            → String(60), obrigatório — nome no mural
+  - cidade             → String(80), obrigatório — cidade para trocas locais
+
+Relacionamento (1 → N com OfertaTroca):
+  ofertas = db.relationship("OfertaTroca", back_populates="colecionador", ...)
+
+  Isso permite:
+    colecionador.ofertas      → lista de todas as ofertas desse colecionador
+    oferta.colecionador       → objeto Colecionador dono daquela oferta
+
+  cascade="all, delete-orphan" → ao deletar um Colecionador, suas ofertas
+  também são deletadas automaticamente do banco.
+
+Método de classe:
+  Colecionador.listar() → retorna todos os colecionadores em ordem de apelido.
+  Usado pelo controller para popular o <select> do formulário.
+
+
+================================================================================
+4. models/figurinha.py — TABELA figurinhas
+================================================================================
+
+O que faz:
+  Representa cada carta/figurinha do álbum da Copa do Mundo.
+
+Campos:
+  - id, data_criacao  → herdados
+  - numero            → Integer — número no álbum (ex.: 42)
+  - nome_jogador      → String(100) — ex.: "Vinicius Jr."
+  - time              → String(80) — ex.: "Brasil"
+
+Relacionamento:
+  Não declara relationship() aqui, pois o lado "muitos" (ItemOferta)
+  é que mantém a FK. O acesso item.figurinha é declarado em ItemOferta.
+
+Método de classe:
+  Figurinha.listar() → retorna todas ordenadas por número.
+  Usado pelo controller para popular os dois <select> de figurinhas.
+
+
+================================================================================
+5. models/oferta.py — TABELAS ofertas_troca + itens_oferta
+================================================================================
+
+CLASSE OfertaTroca:
+  Representa o cabeçalho de uma proposta de troca.
+
+  Campos:
+    - colecionador_id → Integer, FK → colecionadores.id (obrigatório)
+    - observacao      → String(255), opcional
+
+  Relacionamentos:
+    colecionador = relationship("Colecionador")
+      → permite oferta.colecionador.apelido no template
+
+    itens = relationship("ItemOferta", cascade="all, delete-orphan")
+      → permite oferta.itens para listar as figurinhas da oferta
+
+  Método:
+    OfertaTroca.listar_com_colecionador()
+      → retorna todas as ofertas, mais recentes primeiro (desc)
+
+
+CLASSE ItemOferta:
+  Representa uma linha da oferta — qual figurinha e se é "oferece" ou "deseja".
+
+  Campos:
+    - oferta_id      → Integer, FK → ofertas_troca.id
+    - figurinha_id   → Integer, FK → figurinhas.id
+    - tipo           → String(20): "oferece" ou "deseja"
+    - quantidade     → Integer, default=1
+
+  Relacionamentos:
+    oferta    = relationship("OfertaTroca") → item.oferta
+    figurinha = relationship("Figurinha")   → item.figurinha.nome_jogador
+
+Diagrama resumido:
+  Colecionador ──< OfertaTroca ──< ItemOferta >── Figurinha
+      (1)               (N)            (N)              (1)
+
+
+================================================================================
+6. controllers/figurinhas_controller.py — ROTAS /figurinhas/*
+================================================================================
+
+O que faz:
+  Define o Blueprint "figurinhas" e implementa as 2 rotas do cenário C.
+
+Blueprint:
+  figurinhas_bp = Blueprint("figurinhas", __name__, url_prefix="/figurinhas")
+  O nome "figurinhas" é o que o Jinja2 usa em url_for('figurinhas.index').
+  O url_prefix="/figurinhas" faz todas as rotas começarem com /figurinhas/.
+
+ROTA 1 — index() → GET /figurinhas/
+  - Chama OfertaTroca.listar_com_colecionador() para buscar todas as ofertas
+  - Renderiza lista_ofertas.html passando a variável `ofertas`
+
+ROTA 2 — cadastrar_oferta() → GET + POST /figurinhas/oferta/cadastrar/
+  GET:
+    - Busca colecionadores e figurinhas do banco
+    - Renderiza formulario_oferta.html com as listas para popular os selects
+
+  POST (quando o formulário é enviado):
+    1. Lê colecionador_id, figurinha_oferece_id, figurinha_deseja_id, observacao
+       do request.form
+    2. Cria OfertaTroca com o colecionador e a observação
+    3. db.session.flush() → gera o id da oferta sem fechar a transação
+    4. Cria ItemOferta tipo="oferece" com figurinha_oferece_id
+    5. Cria ItemOferta tipo="deseja"  com figurinha_deseja_id
+    6. db.session.commit() → confirma TUDO de uma vez no banco
+    7. redirect(url_for("figurinhas.index")) → volta ao mural (padrão PRG)
+
+Padrão PRG (Post/Redirect/Get):
+  Após o commit, redirecionamos com redirect() para evitar que atualizar
+  a página (F5) reenvie o formulário e duplique o cadastro.
+
+
+================================================================================
+7. controllers/__init__.py
+================================================================================
+
+Importa o Blueprint para que o app.py possa acessá-lo com:
+  from controllers.figurinhas_controller import figurinhas_bp
+
+Mantém o app.py sem importações diretas de submódulos dos controllers.
+
+
+================================================================================
+8. app.py — PONTO DE ENTRADA DO SERVIDOR FLASK
+================================================================================
+
+Sequência de inicialização:
+  1. Cria o app Flask com as pastas de templates e estáticos
+  2. Configura SQLALCHEMY_DATABASE_URI → SQLite local (aula11.db)
+  3. db.init_app(app) → conecta SQLAlchemy ao app
+  4. app.register_blueprint(figurinhas_bp) → ativa as rotas /figurinhas/*
+  5. with app.app_context(): db.create_all() → cria as tabelas no banco
+  6. app.run(debug=True) → inicia o servidor de desenvolvimento
+
+O que é app_context()?
+  O Flask trabalha com contextos. Operações de banco (como create_all)
+  precisam saber qual app estão usando. O "with app.app_context():" fornece
+  esse contexto antes de criar as tabelas.
+
+
+================================================================================
+9. views/templates/layout.html — HTML BASE
+================================================================================
+
+O que faz:
+  Template base do projeto. Define estrutura HTML completa + CSS + menu.
+
+Blocos substituíveis pelos filhos:
+  {% block title %}   → título da aba do navegador
+  {% block content %} → área de conteúdo principal
+
+Link adicionado no menu para o cenário C:
+  <a href="{{ url_for('figurinhas.index') }}">🃏 Figurinhas</a>
+  url_for garante que a URL seja gerada dinamicamente pelo Flask, mesmo
+  que o url_prefix mude.
+
+
+================================================================================
+10. views/templates/figurinhas/lista_ofertas.html — MURAL DE OFERTAS
+================================================================================
+
+Herda de layout.html via {% extends "layout.html" %}.
+
+Lógica Jinja2 utilizada:
+  {% if not ofertas %}
+    → exibe mensagem amigável se a lista estiver vazia
+
+  {% for oferta in ofertas %}
+    → itera sobre cada OfertaTroca retornada pelo controller
+
+  {{ oferta.colecionador.apelido }}
+    → acessa o objeto relacionado (relationship) sem query extra
+
+  {{ oferta.data_criacao.strftime("%d/%m/%Y às %H:%M") }}
+    → formata o datetime para exibição amigável
+
+  {{ oferta.observacao or "—" }}
+    → mostra "—" quando a observação for None (opcional)
+
+
+================================================================================
+11. views/templates/figurinhas/formulario_oferta.html — FORMULÁRIO
+================================================================================
+
+Herda de layout.html.
+
+Campos do formulário:
+  name="colecionador_id"      → <select> gerado por loop Jinja2
+  name="figurinha_oferece_id" → <select> com todas as figurinhas
+  name="figurinha_deseja_id"  → <select> com todas as figurinhas
+  name="observacao"           → <input type="text"> opcional
+
+Loops Jinja2 nos selects:
+  {% for c in colecionadores %}
+    <option value="{{ c.id }}">{{ c.apelido }} — {{ c.cidade }}</option>
+  {% endfor %}
+
+  O value="{{ c.id }}" é o que chega no POST como colecionador_id.
+  O texto visível (c.apelido — c.cidade) ajuda o usuário a identificar
+  cada opção.
+
+url_for no action:
+  action="{{ url_for('figurinhas.cadastrar_oferta') }}"
+  → Flask gera /figurinhas/oferta/cadastrar automaticamente.
+
+
+================================================================================
+FLUXO COMPLETO — DO BROWSER AO BANCO
+================================================================================
+
+1. Usuário acessa /figurinhas/ no browser
+   → Flask chama index() no controller
+   → index() chama OfertaTroca.listar_com_colecionador()
+   → SQLAlchemy executa SELECT nas tabelas ofertas_troca + colecionadores
+   → render_template envia lista_ofertas.html preenchida para o browser
+
+2. Usuário clica em "+ Nova oferta"
+   → browser faz GET /figurinhas/oferta/cadastrar
+   → controller busca colecionadores e figurinhas
+   → render_template envia formulario_oferta.html com os selects populados
+
+3. Usuário preenche e clica em "Publicar oferta"
+   → browser faz POST /figurinhas/oferta/cadastrar com os campos
+   → controller lê request.form, cria OfertaTroca + 2 ItemOferta
+   → db.session.commit() salva tudo no SQLite
+   → redirect leva o browser de volta ao mural (/figurinhas/)
+   → mural agora exibe a nova oferta na primeira linha (mais recente)
+
+
+================================================================================
+ERROS COMUNS E SOLUÇÕES
+================================================================================
+
+TemplateNotFound: lista_ofertas.html
+  → Verifique se o arquivo está em views/templates/figurinhas/ (subpasta!)
+
+sqlalchemy.exc.OperationalError: no such table
+  → db.create_all() não foi chamado, ou os models não foram importados
+    no __init__.py antes do create_all()
+
+werkzeug.routing.BuildError: Could not build url for endpoint 'figurinhas.index'
+  → Blueprint não registrado no app.py com app.register_blueprint(figurinhas_bp)
+
+IntegrityError: NOT NULL constraint failed
+  → Algum campo obrigatório não foi enviado pelo formulário;
+    verifique se o name= do HTML bate com o request.form.get() do controller
+
+================================================================================

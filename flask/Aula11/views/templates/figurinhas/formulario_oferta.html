@@ -1,0 +1,109 @@
+{# ============================================================================
+   views/templates/figurinhas/formulario_oferta.html
+   Cenário: C - Figurinhas
+   ============================================================================
+   Formulário para publicar uma nova oferta de troca.
+
+   Herança de template:
+     extends "layout.html" → reaproveita estrutura HTML base do projeto
+
+   Variáveis recebidas do controller (cadastrar_oferta() — GET):
+     colecionadores → lista de objetos Colecionador (para popular o <select>)
+     figurinhas     → lista de objetos Figurinha     (para popular os <select>)
+
+   Ao submeter (POST), os campos enviados são:
+     colecionador_id       → int (FK do colecionador dono da oferta)
+     figurinha_oferece_id  → int (FK da figurinha que ele TEM)
+     figurinha_deseja_id   → int (FK da figurinha que ele QUER)
+     observacao            → str opcional
+   ============================================================================ #}
+
+{% extends "layout.html" %}
+
+{% block title %}Nova oferta{% endblock %}
+
+{% block content %}
+<h1>Nova oferta de troca</h1>
+
+{# action → para onde o POST vai; url_for resolve o nome da rota pelo Blueprint #}
+{# method="POST" → envia dados no corpo HTTP (não na URL) #}
+<form method="POST" action="{{ url_for('figurinhas.cadastrar_oferta') }}">
+
+    {# -----------------------------------------------------------------------
+       Campo 1: Seleção do colecionador dono da oferta
+       ----------------------------------------------------------------------- #}
+    <div class="form-grupo">
+        <label for="colecionador_id">Colecionador</label>
+
+        {# name="colecionador_id" → nome que o controller lê com request.form.get()
+           required → HTML5 impede submit sem selecionar uma opção válida #}
+        <select name="colecionador_id" id="colecionador_id" required>
+            <option value="">Quem está oferecendo?</option>
+
+            {# Loop Jinja2: gera um <option> para cada Colecionador no banco
+               c.id    → valor enviado no POST (inteiro, vira colecionador_id)
+               c.apelido → texto visível ao usuário no dropdown #}
+            {% for c in colecionadores %}
+                <option value="{{ c.id }}">{{ c.apelido }} — {{ c.cidade }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {# -----------------------------------------------------------------------
+       Campo 2: Figurinha que o colecionador POSSUI e quer DAR
+       ----------------------------------------------------------------------- #}
+    <div class="form-grupo">
+        <label for="figurinha_oferece_id">Figurinha que OFERECE</label>
+
+        <select name="figurinha_oferece_id" id="figurinha_oferece_id" required>
+            <option value="">Número / jogador...</option>
+
+            {# Loop: gera um <option> para cada Figurinha cadastrada
+               Exibe: "#10 - Vinicius Jr. (Brasil)" para identificação fácil #}
+            {% for f in figurinhas %}
+                <option value="{{ f.id }}">
+                    #{{ f.numero }} — {{ f.nome_jogador }} ({{ f.time }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {# -----------------------------------------------------------------------
+       Campo 3: Figurinha que o colecionador NÃO TEM e quer RECEBER
+       ----------------------------------------------------------------------- #}
+    <div class="form-grupo">
+        <label for="figurinha_deseja_id">Figurinha que DESEJA</label>
+
+        {# Mesmo loop, mas o valor vai para figurinha_deseja_id no POST #}
+        <select name="figurinha_deseja_id" id="figurinha_deseja_id" required>
+            <option value="">Número / jogador...</option>
+
+            {% for f in figurinhas %}
+                <option value="{{ f.id }}">
+                    #{{ f.numero }} — {{ f.nome_jogador }} ({{ f.time }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {# -----------------------------------------------------------------------
+       Campo 4: Observação livre (opcional)
+       ----------------------------------------------------------------------- #}
+    <div class="form-grupo">
+        <label for="observacao">Observação <small>(opcional)</small></label>
+        <input
+            type="text"
+            name="observacao"
+            id="observacao"
+            placeholder="Ex.: só troco por repetidas, preciso urgente..."
+        >
+    </div>
+
+    {# Botão de envio do formulário → dispara o POST #}
+    <button type="submit">Publicar oferta</button>
+</form>
+
+{# Link de volta ao mural sem precisar do botão Voltar do navegador #}
+<p><a href="{{ url_for('figurinhas.index') }}">← Voltar ao mural</a></p>
+
+{% endblock %}

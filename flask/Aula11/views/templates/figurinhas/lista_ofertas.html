@@ -1,0 +1,78 @@
+{# ============================================================================
+   views/templates/figurinhas/lista_ofertas.html
+   Cenário: C - Figurinhas
+   ============================================================================
+   Template da tela principal: mural com todas as ofertas de troca.
+
+   Herança de template:
+     extends "layout.html" → aproveita o HTML base (head, menu, footer)
+     block content         → substitui apenas o conteúdo central da página
+
+   Variáveis recebidas do controller (index()):
+     ofertas → lista de objetos OfertaTroca (pode ser vazia)
+   ============================================================================ #}
+
+{% extends "layout.html" %}
+
+{# Título exibido na aba do navegador (substitui o block title do layout) #}
+{% block title %}Troca de Figurinhas{% endblock %}
+
+{% block content %}
+<h1>Ofertas de troca — Copa do Mundo</h1>
+
+{# Link para o formulário de nova oferta usando url_for com o nome do Blueprint #}
+<p>
+    <a class="btn" href="{{ url_for('figurinhas.cadastrar_oferta') }}">
+        + Nova oferta
+    </a>
+</p>
+
+{# -----------------------------------------------------------------------
+   Bloco condicional: exibe mensagem amigável se não houver ofertas,
+   ou a tabela completa se houver pelo menos uma.
+   if/else/endif → sintaxe Jinja2 para lógica no template
+   ----------------------------------------------------------------------- #}
+{% if not ofertas %}
+    {# Mensagem exibida quando a lista está vazia (primeiro acesso) #}
+    <p>Nenhuma oferta publicada ainda. Seja o primeiro!</p>
+
+{% else %}
+    {# Tabela com todas as ofertas cadastradas #}
+    <table>
+        <thead>
+            <tr>
+                <th>Colecionador</th>
+                <th>Cidade</th>
+                <th>Observação</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {# -----------------------------------------------------------
+               Loop principal: itera sobre cada oferta da lista.
+               for ... in ... / endfor → sintaxe Jinja2
+               oferta.colecionador → acessa o objeto relacionado via
+               relationship (sem query extra, pois SQLAlchemy já fez JOIN)
+               ----------------------------------------------------------- #}
+            {% for oferta in ofertas %}
+            <tr>
+                {# Apelido do colecionador (ex.: "Zeca_SP")
+                   Navegamos pela relationship: oferta → colecionador → apelido #}
+                <td>{{ oferta.colecionador.apelido }}</td>
+
+                {# Cidade do colecionador, também via relationship #}
+                <td>{{ oferta.colecionador.cidade }}</td>
+
+                {# Observação: pode ser None → "or" garante texto padrão #}
+                <td>{{ oferta.observacao or "—" }}</td>
+
+                {# data_criacao é um objeto datetime; strftime formata como
+                   "14/06/2026 às 19:45" para exibição amigável #}
+                <td>{{ oferta.data_criacao.strftime("%d/%m/%Y às %H:%M") }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endif %}
+{% endblock %}

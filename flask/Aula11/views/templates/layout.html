@@ -1,0 +1,92 @@
+{# ============================================================================
+   views/templates/layout.html
+   Cenário: C - Figurinhas
+   ============================================================================
+   Template base do projeto MVC Aula 11.
+   Todos os outros templates herdam deste via {% extends "layout.html" %}.
+
+   Blocos substituíveis pelos templates filhos:
+     block title   → texto da aba do navegador
+     block content → conteúdo principal da página
+
+   ATENÇÃO: este arquivo já existia na Aula 11.
+   A única linha ADICIONADA para o cenário C está marcada abaixo.
+   ============================================================================ #}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {# block title → cada template filho define seu próprio título.
+       Se não definir, usa o valor padrão "Aula 11" #}
+    <title>{% block title %}Aula 11{% endblock %}</title>
+
+    <style>
+        /* Reset básico e tipografia */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+
+        /* Barra de navegação */
+        nav { background: #2c3e50; padding: 0.8rem 1.5rem; }
+        nav a {
+            color: #ecf0f1; text-decoration: none;
+            margin-right: 1rem; font-size: 0.95rem;
+        }
+        nav a:hover { text-decoration: underline; }
+
+        /* Área de conteúdo */
+        main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { margin-bottom: 1rem; color: #2c3e50; }
+
+        /* Tabela */
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 0.6rem 0.9rem; border: 1px solid #ddd; text-align: left; }
+        th { background: #2c3e50; color: #fff; }
+        tr:nth-child(even) { background: #f9f9f9; }
+
+        /* Formulário */
+        .form-grupo { margin-bottom: 1rem; }
+        .form-grupo label { display: block; font-weight: bold; margin-bottom: 0.3rem; }
+        .form-grupo select,
+        .form-grupo input[type="text"] {
+            width: 100%; padding: 0.5rem;
+            border: 1px solid #ccc; border-radius: 4px;
+        }
+        button[type="submit"] {
+            background: #2980b9; color: #fff; border: none;
+            padding: 0.6rem 1.4rem; border-radius: 4px; cursor: pointer;
+        }
+        button[type="submit"]:hover { background: #1a6a9a; }
+
+        /* Botão de ação (link estilizado) */
+        a.btn {
+            display: inline-block; background: #27ae60; color: #fff;
+            padding: 0.5rem 1rem; border-radius: 4px;
+            text-decoration: none; margin-bottom: 1rem;
+        }
+        a.btn:hover { background: #1e8449; }
+    </style>
+</head>
+<body>
+
+    {# ── MENU DE NAVEGAÇÃO ─────────────────────────────────────────────────
+       url_for('BLUEPRINT.FUNÇÃO') gera a URL correta mesmo se o prefixo mudar.
+       ── ADICIONAR para o cenário C: a linha com 'figurinhas.index' ──────── #}
+    <nav>
+        <a href="/">Início</a>
+
+        {# ── ADICIONAR ────────────────────────────────────────────────────
+           Link para o mural de trocas do cenário C.
+           'figurinhas.index' → Blueprint "figurinhas", função "index" #}
+        <a href="{{ url_for('figurinhas.index') }}">🃏 Figurinhas</a>
+        {# ─────────────────────────────────────────────────────────────── #}
+    </nav>
+
+    {# Conteúdo principal: substituído por cada template filho #}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
